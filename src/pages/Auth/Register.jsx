@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { api } from "@/lib/api"
+import { toast } from "sonner"
 
 export default function Register() {
   const [username, setUsername] = useState("")
@@ -24,11 +25,18 @@ export default function Register() {
       
       console.log("Registration successful:", response.data)
       setSuccess(true)
+      toast.success("Registration successful! Redirecting to verification...")
+      
+      // Store in localStorage so the verify page survives a page refresh
+      localStorage.setItem("verificationEmail", email)
+      if (response.data.otpExpiresAt) {
+        localStorage.setItem("otpExpiresAt", response.data.otpExpiresAt)
+      }
       
       // Give the user a moment to see the success message, then redirect to login
-      // Navigate to OTP verification page, passing the email in state so it doesn't need to be typed again
+      // Navigate to OTP verification page, passing the email and expiration time in state
       setTimeout(() => {
-        navigate("/verify-email", { state: { email: email } })
+        navigate("/verify-email", { state: { email: email, otpExpiresAt: response.data.otpExpiresAt } })
       }, 1500)
     } catch (err) {
       console.error("Registration failed:", err)
@@ -51,12 +59,6 @@ export default function Register() {
           {error && (
             <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg text-center font-medium">
               {error}
-            </div>
-          )}
-          
-          {success && (
-            <div className="p-3 text-sm text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg text-center font-medium">
-              Registration successful! Redirecting to verification...
             </div>
           )}
 

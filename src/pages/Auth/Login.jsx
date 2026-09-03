@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { api } from "@/lib/api"
+import { toast } from "sonner"
 
 export default function Login() {
   const [email, setEmail] = useState("")
@@ -24,6 +25,7 @@ export default function Login() {
       localStorage.setItem("token", response.data.accessToken)
       
       console.log("Login successful:", response.data)
+      toast.success("Login successful!")
       
       // Redirect to the dashboard / protected route
       navigate("/")
